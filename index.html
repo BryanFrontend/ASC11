@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASCII Art Studio</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="logo">
+        <span class="logo-bracket">[</span>
+        <span class="logo-text">ASCII</span>
+        <span class="logo-accent">STUDIO</span>
+        <span class="logo-bracket">]</span>
+      </div>
+      <div class="status-bar">
+        <span id="status-fps">FPS: --</span>
+        <span id="status-res">RES: --</span>
+        <span id="status-chars">CHARS: --</span>
+        <span id="status-mode" class="mode-badge">IDLE</span>
+      </div>
+    </header>
+
+    <div id="workspace">
+      <!-- LEFT PANEL: Controls -->
+      <aside id="control-panel">
+        <!-- Media Source -->
+        <section class="panel-section" id="section-source">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>MEDIA SOURCE</span>
+          </div>
+          <div class="btn-group">
+            <button class="source-btn active" id="btn-image" onclick="app.setSource('image')">
+              <span class="btn-icon">⊞</span> IMAGE
+            </button>
+            <button class="source-btn" id="btn-video" onclick="app.setSource('video')">
+              <span class="btn-icon">▶</span> VIDEO
+            </button>
+            <button class="source-btn" id="btn-webcam" onclick="app.setSource('webcam')">
+              <span class="btn-icon">◉</span> WEBCAM
+            </button>
+          </div>
+          <div id="upload-zone" class="upload-zone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">⊕</div>
+            <div class="upload-text">DROP FILE HERE<br/><span class="upload-sub">or click to browse</span></div>
+            <input type="file" id="file-input" accept="image/*,video/*" hidden />
+          </div>
+          <div id="webcam-controls" class="hidden">
+            <button class="action-btn" id="btn-start-cam" onclick="app.startWebcam()">◉ START CAMERA</button>
+            <button class="action-btn danger hidden" id="btn-stop-cam" onclick="app.stopWebcam()">◻ STOP CAMERA</button>
+          </div>
+        </section>
+
+        <!-- ASCII Style -->
+        <section class="panel-section" id="section-style">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>ASCII STYLE</span>
+          </div>
+          <div class="control-group">
+            <label>CHARACTER SET</label>
+            <select id="charset-select" class="styled-select" onchange="app.updateSettings()">
+              <option value="classic">Classic ASCII</option>
+              <option value="dense">Dense ASCII</option>
+              <option value="blocks">Block Elements</option>
+              <option value="braille">Braille</option>
+              <option value="dots">Dot Matrix</option>
+              <option value="binary">Binary</option>
+              <option value="hex">Hexadecimal</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>COLOR MODE</label>
+            <select id="color-mode" class="styled-select" onchange="app.updateSettings()">
+              <option value="green">Terminal Green</option>
+              <option value="amber">Amber CRT</option>
+              <option value="white">Classic White</option>
+              <option value="cyan">Cyan Matrix</option>
+              <option value="color">Full Color</option>
+              <option value="red">Red Alert</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <label>INVERT COLORS</label>
+            <label class="toggle">
+              <input type="checkbox" id="invert-toggle" onchange="app.updateSettings()"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>EDGE DETECT</label>
+            <label class="toggle">
+              <input type="checkbox" id="edge-toggle" onchange="app.updateSettings()"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Render Settings -->
+        <section class="panel-section" id="section-render">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>RENDER SETTINGS</span>
+          </div>
+          <div class="slider-group">
+            <label>BRIGHTNESS <span id="val-brightness">128</span></label>
+            <input type="range" id="sl-brightness" min="0" max="255" value="128" class="slider" oninput="app.updateSlider('brightness', this.value)"/>
+          </div>
+          <div class="slider-group">
+            <label>CONTRAST <span id="val-contrast">128</span></label>
+            <input type="range" id="sl-contrast" min="0" max="255" value="128" class="slider" oninput="app.updateSlider('contrast', this.value)"/>
+          </div>
+          <div class="slider-group">
+            <label>FONT SIZE <span id="val-fontsize">8</span>px</label>
+            <input type="range" id="sl-fontsize" min="4" max="20" value="8" class="slider" oninput="app.updateSlider('fontsize', this.value)"/>
+          </div>
+          <div class="slider-group">
+            <label>CHAR SPACING <span id="val-spacing">1.0</span>x</label>
+            <input type="range" id="sl-spacing" min="5" max="20" value="10" class="slider" oninput="app.updateSlider('spacing', this.value)"/>
+          </div>
+          <div class="slider-group">
+            <label>RESOLUTION <span id="val-resolution">50</span>%</label>
+            <input type="range" id="sl-resolution" min="10" max="100" value="50" class="slider" oninput="app.updateSlider('resolution', this.value)"/>
+          </div>
+          <div class="slider-group" id="fps-control">
+            <label>FRAME RATE <span id="val-fps">24</span> fps</label>
+            <input type="range" id="sl-fps" min="1" max="60" value="24" class="slider" oninput="app.updateSlider('fps', this.value)"/>
+          </div>
+        </section>
+      </aside>
+
+      <!-- CENTER: Preview -->
+      <main id="preview-area">
+        <div id="preview-header">
+          <span class="preview-label">◈ LIVE PREVIEW</span>
+          <div class="preview-actions">
+            <button class="pill-btn" onclick="app.toggleRendering()"><span id="render-btn-text">▶ RENDER</span></button>
+            <button class="pill-btn" onclick="app.captureFrame()">⊞ CAPTURE</button>
+          </div>
+        </div>
+        <div id="preview-container">
+          <div id="idle-screen">
+            <div class="idle-art">
+<pre class="idle-pre">
+ █████╗ ███████╗ ██████╗██╗██╗
+██╔══██╗██╔════╝██╔════╝██║██║
+███████║███████╗██║     ██║██║
+██╔══██║╚════██║██║     ██║██║
+██║  ██║███████║╚██████╗██║██║
+╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝╚═╝</pre>
+              <div class="idle-sub">LOAD A MEDIA SOURCE TO BEGIN</div>
+            </div>
+          </div>
+          <pre id="ascii-output" class="hidden"></pre>
+          <canvas id="color-canvas" class="hidden"></canvas>
+        </div>
+        <canvas id="hidden-canvas" style="display:none"></canvas>
+        <video id="video-element" style="display:none" crossorigin="anonymous"></video>
+        <img id="image-element" style="display:none" crossorigin="anonymous"/>
+      </main>
+
+      <!-- RIGHT PANEL: Export -->
+      <aside id="export-panel">
+        <section class="panel-section">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>EXPORT</span>
+          </div>
+          <div class="export-options">
+            <div class="export-format" onclick="app.exportAs('html')" title="Export as HTML page">
+              <div class="export-icon">⊞</div>
+              <div class="export-label">HTML</div>
+              <div class="export-desc">Animated webpage</div>
+            </div>
+            <div class="export-format" onclick="app.exportAs('js')" title="Export as JavaScript">
+              <div class="export-icon">⟨⟩</div>
+              <div class="export-label">JAVASCRIPT</div>
+              <div class="export-desc">Animation loop</div>
+            </div>
+            <div class="export-format" onclick="app.exportAs('txt')" title="Export as plain text">
+              <div class="export-icon">≡</div>
+              <div class="export-label">TEXT</div>
+              <div class="export-desc">Plain ASCII</div>
+            </div>
+            <div class="export-format" onclick="app.exportAs('svg')" title="Export as SVG">
+              <div class="export-icon">◎</div>
+              <div class="export-label">SVG</div>
+              <div class="export-desc">Vector graphic</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>FRAME BUFFER</span>
+          </div>
+          <div id="frame-buffer">
+            <div class="buffer-empty">No frames captured</div>
+          </div>
+          <button class="action-btn" onclick="app.clearFrameBuffer()">◻ CLEAR BUFFER</button>
+          <button class="action-btn success" onclick="app.exportAnimation()">▶ EXPORT ANIMATION</button>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-header">
+            <span class="section-icon">◈</span>
+            <span>PRESETS</span>
+          </div>
+          <div class="preset-list">
+            <button class="preset-btn" onclick="app.applyPreset('matrix')">◈ MATRIX</button>
+            <button class="preset-btn" onclick="app.applyPreset('retro')">◈ RETRO CRT</button>
+            <button class="preset-btn" onclick="app.applyPreset('blueprint')">◈ BLUEPRINT</button>
+            <button class="preset-btn" onclick="app.applyPreset('thermal')">◈ THERMAL</button>
+            <button class="preset-btn" onclick="app.applyPreset('hacker')">◈ HACKER</button>
+            <button class="preset-btn" onclick="app.applyPreset('minimal')">◈ MINIMAL</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden"></div>
+  </div>
+
+  <script src="ascii-engine.js"></script>
+  <script src="renderer.js"></script>
+  <script src="webcam.js"></script>
+  <script src="video.js"></script>
+  <script src="export.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

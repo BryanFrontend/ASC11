@@ -1,0 +1,28 @@
+{
+  "name": "ascii-art-studio",
+  "version": "1.0.0",
+  "description": "Real-time ASCII art converter for images, videos, and webcam feeds",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . --listen 8080",
+    "dev": "npx live-server --port=8080 --open=index.html",
+    "serve": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "ascii", "art", "converter", "webcam", "canvas", "real-time",
+    "animation", "terminal", "retro", "creative-coding"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}
