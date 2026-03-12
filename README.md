@@ -2,7 +2,7 @@
 
 > Convert images, videos, and webcam feeds into animated ASCII art in real time.
 
-![ASCII Art Studio](assets/example.jpg)
+![ASCII Art Studio](example.jpg)
 
 ---
 
